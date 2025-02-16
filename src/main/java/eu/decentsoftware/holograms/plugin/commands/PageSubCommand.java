@@ -15,7 +15,6 @@ import eu.decentsoftware.holograms.api.holograms.HologramLine;
 import eu.decentsoftware.holograms.api.holograms.HologramPage;
 import eu.decentsoftware.holograms.api.utils.Common;
 import eu.decentsoftware.holograms.api.utils.entity.DecentEntityType;
-import eu.decentsoftware.holograms.api.utils.items.DecentMaterial;
 import eu.decentsoftware.holograms.api.utils.message.Message;
 import eu.decentsoftware.holograms.plugin.Validator;
 import org.bukkit.Bukkit;
@@ -155,7 +154,7 @@ public class PageSubCommand extends DecentCommand {
                     return TabCompleteHandler.getPartialMatches(args[0], PLUGIN.getHologramManager().getHologramNames());
                 } else if (args.length == 3 && (args[1].startsWith("#ICON:") || args[1].startsWith("#HEAD:") || args[1].startsWith("#SMALLHEAD:"))) {
                     return TabCompleteHandler.getPartialMatches(args[2], Arrays.stream(Material.values())
-                        .filter(DecentMaterial::isItem)
+                        .filter(Material::isItem)
                         .map(Material::name)
                         .collect(Collectors.toList()));
                 } else if (args.length == 3 && args[1].startsWith("#ENTITY:")) {
@@ -213,7 +212,7 @@ public class PageSubCommand extends DecentCommand {
                     }
                 } else if (args.length == 4 && (args[2].startsWith("#ICON:") || args[2].startsWith("#HEAD:") || args[2].startsWith("#SMALLHEAD:"))) {
                     return TabCompleteHandler.getPartialMatches(args[2], Arrays.stream(Material.values())
-                        .filter(DecentMaterial::isItem)
+                        .filter(Material::isItem)
                         .map(Material::name)
                         .collect(Collectors.toList()));
                 } else if (args.length == 4 && args[2].startsWith("#ENTITY:")) {

@@ -1,11 +1,10 @@
 package eu.decentsoftware.holograms.plugin;
 
-import de.tr7zw.changeme.nbtapi.NBT;
+import de.tr7zw.nbtapi.NBT;
 import eu.decentsoftware.holograms.api.DecentHolograms;
 import eu.decentsoftware.holograms.api.DecentHologramsAPI;
 import eu.decentsoftware.holograms.api.commands.CommandManager;
 import eu.decentsoftware.holograms.api.commands.DecentCommand;
-import eu.decentsoftware.holograms.api.utils.reflect.Version;
 import eu.decentsoftware.holograms.plugin.commands.HologramsCommand;
 import eu.decentsoftware.holograms.plugin.features.DamageDisplayFeature;
 import eu.decentsoftware.holograms.plugin.features.HealingDisplayFeature;
@@ -18,7 +17,12 @@ public class DecentHologramsPlugin extends JavaPlugin {
 
 	@Override
 	public void onLoad() {
-		if (Version.CURRENT == null) {
+		try {
+			if (getServer().getUnsafe().getProtocolVersion() < 768) {
+				unsupportedServerVersion = true;
+				return;
+			}
+		} catch (Exception ignored) {
 			unsupportedServerVersion = true;
 			return;
 		}

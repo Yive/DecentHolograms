@@ -11,7 +11,6 @@ import eu.decentsoftware.holograms.api.holograms.HologramPage;
 import eu.decentsoftware.holograms.api.holograms.enums.EnumFlag;
 import eu.decentsoftware.holograms.api.utils.Common;
 import eu.decentsoftware.holograms.api.utils.entity.DecentEntityType;
-import eu.decentsoftware.holograms.api.utils.items.DecentMaterial;
 import eu.decentsoftware.holograms.api.utils.location.LocationUtils;
 import eu.decentsoftware.holograms.api.utils.message.Message;
 import eu.decentsoftware.holograms.plugin.Validator;
@@ -362,7 +361,7 @@ public class HologramSubCommand extends DecentCommand {
 			return (sender, args) -> {
 				if (args.length == 3 && (args[1].startsWith("#ICON:") || args[1].startsWith("#HEAD:") || args[1].startsWith("#SMALLHEAD:"))) {
 					return TabCompleteHandler.getPartialMatches(args[2], Arrays.stream(Material.values())
-						.filter(DecentMaterial::isItem)
+						.filter(Material::isItem)
 						.map(Material::name)
 						.collect(Collectors.toList()));
 				} else if (args.length == 3 && args[1].startsWith("#ENTITY:")) {

@@ -1,12 +1,12 @@
 package eu.decentsoftware.holograms.api.utils.items;
 
-import de.tr7zw.changeme.nbtapi.NBT;
-import de.tr7zw.changeme.nbtapi.iface.ReadWriteNBT;
-import de.tr7zw.changeme.nbtapi.utils.DataFixerUtil;
+import de.tr7zw.nbtapi.NBT;
+import de.tr7zw.nbtapi.iface.ReadWriteNBT;
+import de.tr7zw.nbtapi.utils.DataFixerUtil;
+import eu.decentsoftware.holograms.api.utils.Common;
 import eu.decentsoftware.holograms.api.utils.HeadDatabaseUtils;
 import eu.decentsoftware.holograms.api.utils.Log;
 import eu.decentsoftware.holograms.api.utils.PAPI;
-import eu.decentsoftware.holograms.api.utils.reflect.Version;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.apache.commons.lang.StringUtils;
@@ -61,7 +61,7 @@ public class HologramItem {
             }
 
             if (enchanted) {
-                itemBuilder.withUnsafeEnchantment(Enchantment.DURABILITY, 1);
+                itemBuilder.withUnsafeEnchantment(Enchantment.UNBREAKING, 1);
             }
 
             ItemStack itemStack = itemBuilder.toItemStack();
@@ -88,38 +88,28 @@ public class HologramItem {
 
     @SuppressWarnings("deprecation")
     private ItemStack applyNBT(Player player, ItemStack itemStack){
-        if (Version.afterOrEqual(Version.v1_20_R4)) {
-            ReadWriteNBT originalNBT = NBT.itemStackToNBT(itemStack); // Used later for merge.
-            ReadWriteNBT modifiableNBT = NBT.itemStackToNBT(itemStack);
-            modifiableNBT.getOrCreateCompound("tag")
+        ReadWriteNBT originalNBT = NBT.itemStackToNBT(itemStack); // Used later for merge.
+        ReadWriteNBT modifiableNBT = NBT.itemStackToNBT(itemStack);
+        modifiableNBT.getOrCreateCompound("tag")
                 .mergeCompound(NBT.parseNBT(player == null ? nbt : PAPI.setPlaceholders(player, nbt)));
-            try{
-                /*
-                 * DataFixerUtil has an issue where it expects to find "Count", due to expecting pre-1.20.5 NBT data,
-                 * but since we used a 1.20.5+ ItemStack to create the NBT is there only "count", which causes
-                 * DataFixerUtil to not find a valid NBT and does nothing.
-                 * This addition fixes that issue.
-                 */
-                modifiableNBT.setByte("Count", (byte) 1);
-                modifiableNBT = DataFixerUtil.fixUpItemData(modifiableNBT, DataFixerUtil.VERSION1_20_4, DataFixerUtil.getCurrentVersion());
-                /*
-                 * Updating the NBT removes the modern NBT variants of enchants and alike, as Datafixer discards them.
-                 * So we have to manually merge them in again... Not pretty, but it does the job.
-                 */
-                modifiableNBT.mergeCompound(originalNBT);
+        try{
+            /*
+             * DataFixerUtil has an issue where it expects to find "Count", due to expecting pre-1.20.5 NBT data,
+             * but since we used a 1.20.5+ ItemStack to create the NBT is there only "count", which causes
+             * DataFixerUtil to not find a valid NBT and does nothing.
+             * This addition fixes that issue.
+             */
+            modifiableNBT.setByte("Count", (byte) 1);
+            modifiableNBT = DataFixerUtil.fixUpItemData(modifiableNBT, DataFixerUtil.VERSION1_20_4, DataFixerUtil.getCurrentVersion());
+            /*
+             * Updating the NBT removes the modern NBT variants of enchants and alike, as Datafixer discards them.
+             * So we have to manually merge them in again... Not pretty, but it does the job.
+             */
+            modifiableNBT.mergeCompound(originalNBT);
 
-                return NBT.itemStackFromNBT(modifiableNBT);
-            } catch (NoSuchFieldException | IllegalAccessException ex) {
-                Log.warn("Failed to apply NBT Data to Item: %s", ex, nbt);
-                return itemStack;
-            }
-        } else {
-            try {
-                Bukkit.getUnsafe().modifyItemStack(itemStack, nbt);
-            } catch (Exception ex) {
-                Log.warn("Failed to apply NBT Data to Item: %s", ex, nbt);
-            }
-
+            return NBT.itemStackFromNBT(modifiableNBT);
+        } catch (NoSuchFieldException | IllegalAccessException ex) {
+            Log.warn("Failed to apply NBT Data to Item: %s", ex, nbt);
             return itemStack;
         }
     }
@@ -229,16 +219,8 @@ public class HologramItem {
         }
 
         ReadWriteNBT nbtItem = NBT.itemStackToNBT(itemStack);
-        int customModelData;
-        if (Version.afterOrEqual(Version.v1_20_R4)) {
-            // components contains item tags in 1.20.5+
-            customModelData = nbtItem.getOrCreateCompound("components")
+        int customModelData = nbtItem.getOrCreateCompound("components")
                 .getInteger("minecraft:custom_model_data");
-        } else {
-            // 1.20.4 and older have CMD under "tag".
-            customModelData = nbtItem.getOrCreateCompound("tag")
-                .getInteger("CustomModelData");
-        }
 
         if (customModelData > 0) {
             stringBuilder.append("{CustomModelData:").append(customModelData).append('}');

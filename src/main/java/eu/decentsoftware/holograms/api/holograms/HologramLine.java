@@ -14,7 +14,6 @@ import eu.decentsoftware.holograms.api.utils.PAPI;
 import eu.decentsoftware.holograms.api.utils.entity.DecentEntityType;
 import eu.decentsoftware.holograms.api.utils.entity.HologramEntity;
 import eu.decentsoftware.holograms.api.utils.items.HologramItem;
-import eu.decentsoftware.holograms.api.utils.reflect.Version;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -237,7 +236,7 @@ public class HologramLine extends HologramObject {
             type = HologramLineType.ENTITY;
             entity = new HologramEntity(content.substring("#ENTITY:".length()));
             height = NMS.getInstance().getEntityHeight(entity.getType()) + 0.15;
-            setOffsetY(-(height + (Version.afterOrEqual(13) ? 0.1 : 0.2)));
+            setOffsetY(-(height + 0.1));
             return;
         } else {
             type = HologramLineType.TEXT;

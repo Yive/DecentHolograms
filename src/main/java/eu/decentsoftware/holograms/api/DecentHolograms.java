@@ -10,16 +10,12 @@ import eu.decentsoftware.holograms.api.listeners.WorldListener;
 import eu.decentsoftware.holograms.api.nms.NMS;
 import eu.decentsoftware.holograms.api.nms.PacketListener;
 import eu.decentsoftware.holograms.api.utils.BungeeUtils;
-import eu.decentsoftware.holograms.api.utils.Common;
 import eu.decentsoftware.holograms.api.utils.DExecutor;
-import eu.decentsoftware.holograms.api.utils.UpdateChecker;
 import eu.decentsoftware.holograms.api.utils.event.EventFactory;
 import eu.decentsoftware.holograms.api.utils.tick.Ticker;
 import eu.decentsoftware.holograms.event.DecentHologramsReloadEvent;
 import lombok.Getter;
 import lombok.NonNull;
-import org.bstats.bukkit.Metrics;
-import org.bstats.charts.SingleLineChart;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -69,9 +65,6 @@ public final class DecentHolograms {
         pm.registerEvents(new PlayerListener(this), this.plugin);
         pm.registerEvents(new WorldListener(hologramManager), this.plugin);
 
-        setupMetrics();
-        checkForUpdates();
-
         BungeeUtils.init();
     }
 
@@ -104,26 +97,6 @@ public final class DecentHolograms {
         this.featureManager.reload();
 
         EventFactory.fireReloadEvent();
-    }
-
-    private void setupMetrics() {
-        Metrics metrics = new Metrics(this.plugin, 12797);
-        metrics.addCustomChart(new SingleLineChart("holograms", () -> Hologram.getCachedHolograms().size()));
-    }
-
-    private void checkForUpdates() {
-        if (!Settings.CHECK_FOR_UPDATES) {
-            return;
-        }
-
-        UpdateChecker updateChecker = new UpdateChecker(getPlugin(), 96927);
-        updateChecker.getVersion(ver -> {
-            String currentVersion = getPlugin().getDescription().getVersion();
-            if (Common.isVersionHigher(currentVersion, ver)) {
-                Lang.sendUpdateMessage(Bukkit.getConsoleSender());
-                this.updateAvailable = true;
-            }
-        });
     }
 
     @Contract(pure = true)

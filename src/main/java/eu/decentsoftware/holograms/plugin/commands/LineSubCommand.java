@@ -10,7 +10,6 @@ import eu.decentsoftware.holograms.api.holograms.HologramPage;
 import eu.decentsoftware.holograms.api.holograms.enums.EnumFlag;
 import eu.decentsoftware.holograms.api.utils.Common;
 import eu.decentsoftware.holograms.api.utils.entity.DecentEntityType;
-import eu.decentsoftware.holograms.api.utils.items.DecentMaterial;
 import eu.decentsoftware.holograms.api.utils.message.Message;
 import eu.decentsoftware.holograms.plugin.Validator;
 import org.bukkit.Bukkit;
@@ -31,7 +30,7 @@ import java.util.stream.IntStream;
 public class LineSubCommand extends DecentCommand {
 	
 	private static final List<String> items = Arrays.stream(Material.values())
-		.filter(DecentMaterial::isItem)
+		.filter(Material::isItem)
 		.map(Material::name)
 		.collect(Collectors.toList());
 	

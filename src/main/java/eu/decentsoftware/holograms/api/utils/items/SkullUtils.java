@@ -5,11 +5,8 @@ import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import eu.decentsoftware.holograms.api.utils.Log;
 import eu.decentsoftware.holograms.api.utils.reflect.ReflectionUtil;
-import eu.decentsoftware.holograms.api.utils.reflect.Version;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
-import org.bukkit.Bukkit;
-import org.bukkit.SkullType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -89,23 +86,15 @@ public final class SkullUtils {
 			if (profile == null) return null;
 
 			if (VALUE_RESOLVER == null) {
-				try {
-					// Pre 1.20(.4?) uses getValue
-					Property.class.getMethod("getValue");
-					VALUE_RESOLVER = Property::getValue;
-				} catch (NoSuchMethodException ignored) {
-					// Since 1.20(.4?) the Property class is a record and utilizes record-style getter methods
-					//noinspection JavaReflectionMemberAccess - method does exist in newer versions
-					PROPERTY_VALUE_METHOD = Property.class.getMethod("value");
-					VALUE_RESOLVER = property -> {
-						try {
-							return (String) PROPERTY_VALUE_METHOD.invoke(property);
-						} catch (IllegalAccessException | InvocationTargetException e) {
-							Log.error("Failed to invoke Property#value", e);
-						}
-						return null;
-					};
-				}
+				PROPERTY_VALUE_METHOD = Property.class.getMethod("value");
+				VALUE_RESOLVER = property -> {
+					try {
+						return (String) PROPERTY_VALUE_METHOD.invoke(property);
+					} catch (IllegalAccessException | InvocationTargetException e) {
+						Log.error("Failed to invoke Property#value", e);
+					}
+					return null;
+				};
 			}
 
 			PropertyMap properties = profile.getProperties();
@@ -170,11 +159,6 @@ public final class SkullUtils {
 				}
 			}
 			itemStack.setItemMeta(meta);
-
-			if (Version.before(13)) {
-				// noinspection deprecation
-				itemStack.setDurability((short) SkullType.PLAYER.ordinal());
-			}
 		} catch (Exception e) {
 			Log.error("An exception occurred while setting skull texture", e);
 		}
@@ -211,11 +195,6 @@ public final class SkullUtils {
 			((SkullMeta) meta).setOwner(owner);
 
 			itemStack.setItemMeta(meta);
-
-			if (Version.before(13)) {
-				// noinspection deprecation
-				itemStack.setDurability((short) SkullType.PLAYER.ordinal());
-			}
 		}
 	}
 

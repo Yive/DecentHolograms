@@ -1,52 +1,22 @@
 package eu.decentsoftware.holograms.api.utils.color;
 
-import com.google.common.collect.ImmutableMap;
 import eu.decentsoftware.holograms.api.Settings;
 import eu.decentsoftware.holograms.api.utils.color.caching.LruCache;
 import eu.decentsoftware.holograms.api.utils.color.patterns.GradientPattern;
 import eu.decentsoftware.holograms.api.utils.color.patterns.Pattern;
 import eu.decentsoftware.holograms.api.utils.color.patterns.RainbowPattern;
 import eu.decentsoftware.holograms.api.utils.color.patterns.SolidPattern;
-import eu.decentsoftware.holograms.api.utils.reflect.ReflectMethod;
-import eu.decentsoftware.holograms.api.utils.reflect.Version;
 import net.md_5.bungee.api.ChatColor;
 
 import javax.annotation.Nonnull;
 import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 public class IridiumColorAPI {
-
-    private static final ReflectMethod METHOD_OF = new ReflectMethod(ChatColor.class, "of", Color.class);
     public static final List<String> SPECIAL_COLORS = Arrays.asList("&l", "&n", "&o", "&k", "&m");
 
     private static final LruCache LRU_CACHE = new LruCache(Settings.DEFAULT_LRU_CACHE_SIZE);
-
-    /**
-     * Cached result of all legacy colors.
-     *
-     * @since 1.0.0
-     */
-    private static final Map<Color, ChatColor> COLORS = ImmutableMap.<Color, ChatColor>builder()
-            .put(new Color(0), ChatColor.getByChar('0'))
-            .put(new Color(170), ChatColor.getByChar('1'))
-            .put(new Color(43520), ChatColor.getByChar('2'))
-            .put(new Color(43690), ChatColor.getByChar('3'))
-            .put(new Color(11141120), ChatColor.getByChar('4'))
-            .put(new Color(11141290), ChatColor.getByChar('5'))
-            .put(new Color(16755200), ChatColor.getByChar('6'))
-            .put(new Color(11184810), ChatColor.getByChar('7'))
-            .put(new Color(5592405), ChatColor.getByChar('8'))
-            .put(new Color(5592575), ChatColor.getByChar('9'))
-            .put(new Color(5635925), ChatColor.getByChar('a'))
-            .put(new Color(5636095), ChatColor.getByChar('b'))
-            .put(new Color(16733525), ChatColor.getByChar('c'))
-            .put(new Color(16733695), ChatColor.getByChar('d'))
-            .put(new Color(16777045), ChatColor.getByChar('e'))
-            .put(new Color(16777215), ChatColor.getByChar('f'))
-            .build();
 
     /**
      * Cached result of patterns.
@@ -57,7 +27,7 @@ public class IridiumColorAPI {
 
     /**
      * Processes a string to add color to it.
-     * Thanks to Distressing for helping with the regex <3
+     * Thanks to Distressing for helping with the regex &lt;3
      *
      * @param string The string we want to process
      * @since 1.0.0
@@ -99,7 +69,7 @@ public class IridiumColorAPI {
      */
     @Nonnull
     public static String color(@Nonnull String string, @Nonnull Color color) {
-        return (Version.supportsHex() ? METHOD_OF.invokeStatic(color) : getClosestColor(color)) + string;
+        return ChatColor.of(color) + string;
     }
 
     /**
@@ -161,7 +131,7 @@ public class IridiumColorAPI {
      */
     @Nonnull
     public static ChatColor getColor(@Nonnull String string) {
-        return Version.supportsHex() ? METHOD_OF.invokeStatic(new Color(Integer.parseInt(string, 16))) : getClosestColor(new Color(Integer.parseInt(string, 16)));
+        return ChatColor.of(new Color(Integer.parseInt(string, 16)));
     }
 
     /**
@@ -189,12 +159,7 @@ public class IridiumColorAPI {
         ChatColor[] colors = new ChatColor[step];
         double colorStep = (1.00 / step);
         for (int i = 0; i < step; i++) {
-            Color color = Color.getHSBColor((float) (colorStep * i), saturation, saturation);
-            if (Version.supportsHex()) {
-                colors[i] = METHOD_OF.invokeStatic(color);
-            } else {
-                colors[i] = getClosestColor(color);
-            }
+            colors[i] = ChatColor.of(Color.getHSBColor((float) (colorStep * i), saturation, saturation));
         }
         return colors;
     }
@@ -227,35 +192,9 @@ public class IridiumColorAPI {
 
         for (int i = 0; i < step; i++) {
             Color color = new Color(start.getRed() + ((stepR * i) * direction[0]), start.getGreen() + ((stepG * i) * direction[1]), start.getBlue() + ((stepB * i) * direction[2]));
-            if (Version.supportsHex()) {
-                colors[i] = METHOD_OF.invokeStatic(color);
-            } else {
-                colors[i] = getClosestColor(color);
-            }
+            colors[i] = ChatColor.of(color);
         }
         return colors;
-    }
-
-
-    /**
-     * Returns the closest legacy color from an rgb color
-     *
-     * @param color The color we want to transform
-     * @since 1.0.0
-     */
-    @Nonnull
-    private static ChatColor getClosestColor(Color color) {
-        Color nearestColor = null;
-        double nearestDistance = Integer.MAX_VALUE;
-
-        for (Color constantColor : COLORS.keySet()) {
-            double distance = Math.pow(color.getRed() - constantColor.getRed(), 2) + Math.pow(color.getGreen() - constantColor.getGreen(), 2) + Math.pow(color.getBlue() - constantColor.getBlue(), 2);
-            if (nearestDistance > distance) {
-                nearestColor = constantColor;
-                nearestDistance = distance;
-            }
-        }
-        return COLORS.get(nearestColor);
     }
 
 }

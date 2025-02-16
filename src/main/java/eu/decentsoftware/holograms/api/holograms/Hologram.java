@@ -15,8 +15,6 @@ import eu.decentsoftware.holograms.api.utils.config.FileConfig;
 import eu.decentsoftware.holograms.api.utils.event.EventFactory;
 import eu.decentsoftware.holograms.api.utils.exception.LocationParseException;
 import eu.decentsoftware.holograms.api.utils.location.LocationUtils;
-import eu.decentsoftware.holograms.api.utils.reflect.Version;
-import eu.decentsoftware.holograms.api.utils.scheduler.S;
 import eu.decentsoftware.holograms.api.utils.tick.ITicked;
 import eu.decentsoftware.holograms.event.HologramClickEvent;
 import lombok.Getter;
@@ -632,13 +630,7 @@ public class Hologram extends UpdatingHologramObject implements ITicked {
                     hidePageFrom(player, currentPage);
                 }
 
-                if (Version.after(8)) {
-                    showPageTo(player, page, pageIndex);
-                } else {
-                    // We need to run the task later on older versions as, if we don't, it causes issues with some holograms *randomly* becoming invisible.
-                    // I *think* this is from despawning and spawning the entities (with the same ID) in the same tick.
-                    S.sync(() -> showPageTo(player, page, pageIndex), 0L);
-                }
+                showPageTo(player, page, pageIndex);
                 return true;
             }
             return false;

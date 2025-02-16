@@ -1,8 +1,10 @@
 main: "eu.decentsoftware.holograms.plugin.DecentHologramsPlugin"
-api-version: 1.13
+api-version: 1.21
 softdepend:
   - "PlaceholderAPI"
   - "HeadDatabase"
+depend:
+  - "NBTAPI"
 name: "DecentHolograms"
 description: ${description}
 version: ${version}
@@ -310,3 +312,6 @@ permissions:
   dh.command.pages.removeaction:
     description: "Allows player to use the command '/dh pages removeaction <hologram> <page> <clickType> <index>'"
     default: op
+
+libraries:
+  - "com.github.cryptomorin:XSeries:13.0.0"

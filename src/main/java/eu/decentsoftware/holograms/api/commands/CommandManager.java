@@ -1,11 +1,8 @@
 package eu.decentsoftware.holograms.api.commands;
 
 import eu.decentsoftware.holograms.api.DecentHologramsAPI;
-import eu.decentsoftware.holograms.api.utils.reflect.ReflectField;
-import eu.decentsoftware.holograms.api.utils.reflect.ReflectMethod;
-import eu.decentsoftware.holograms.api.utils.reflect.ReflectionUtil;
 import org.bukkit.command.Command;
-import org.bukkit.command.SimpleCommandMap;
+import org.bukkit.command.CommandMap;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -60,28 +57,17 @@ public class CommandManager {
      *  Static Methods
      */
 
-    private static final Class<?> CRAFT_SERVER_CLASS;
-    private static final ReflectMethod GET_COMMAND_MAP_METHOD;
-    private static final ReflectField<Map<String, Command>> COMMAND_MAP_KNOWN_COMMANDS_FIELD;
-
-    static {
-        CRAFT_SERVER_CLASS = ReflectionUtil.getObcClass("CraftServer");
-        GET_COMMAND_MAP_METHOD = new ReflectMethod(CRAFT_SERVER_CLASS, "getCommandMap");
-        COMMAND_MAP_KNOWN_COMMANDS_FIELD = new ReflectField<>(SimpleCommandMap.class, "knownCommands");
-    }
-
     public static void register(Command command) {
         if (command == null) return;
-        SimpleCommandMap commandMap = GET_COMMAND_MAP_METHOD.invoke(DecentHologramsAPI.get().getPlugin().getServer());
+        CommandMap commandMap = DecentHologramsAPI.get().getPlugin().getServer().getCommandMap();
         CommandManager.unregister(command);
         commandMap.register("DecentHolograms", command);
     }
 
     public static void unregister(Command command) {
         if (command == null) return;
-        SimpleCommandMap commandMap = GET_COMMAND_MAP_METHOD.invoke(DecentHologramsAPI.get().getPlugin().getServer());
-        Map<String, Command> cmdMap = COMMAND_MAP_KNOWN_COMMANDS_FIELD.getValue(commandMap);
-        if (cmdMap != null && !cmdMap.isEmpty()) {
+        Map<String, Command> cmdMap = DecentHologramsAPI.get().getPlugin().getServer().getCommandMap().getKnownCommands();
+        if (!cmdMap.isEmpty()) {
             cmdMap.remove(command.getLabel());
             for (final String alias : command.getAliases()) {
                 cmdMap.remove(alias);
